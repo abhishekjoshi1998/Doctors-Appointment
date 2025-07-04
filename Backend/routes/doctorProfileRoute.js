@@ -4,7 +4,7 @@ const {
   createDoctor,
   getAllDoctors,
   getDoctorById
-} = require("../controllers/doctorController");
+} = require("../controllers/doctorProfile.Controller");
 
 
 router.post("/create", createDoctor);

@@ -1,30 +1,38 @@
 const User = require("../models/user");
 
-const exregisterUser = async (req, res) => {
+const registerUser = async (req, res) => {
   const { name, email, password, role } = req.body;
+
   try {
     if (!name || !email || !password) {
-      return res.status(400).json({ message: "all fields required" });
+      return res.status(400).json({ message: "All fields are required" });
     }
-    const newUSer = User({
+
+    const newUser = new User({
       name,
       email,
       password,
       role: role || "user",
     });
-    await newUSer.save();
 
-    res.json({ message: "Uaer Registerd..." });
+    await newUser.save();
+
+    res.status(201).json({ message: "User Registered...", user: newUser });
   } catch (error) {
-    res.json({ message: "somthing went wrong...." });
+    res.status(500).json({ message: "Something went wrong", error: error.message });
   }
 };
 
-const getAllUsers = async(req,res)=>{
-    try {
-        const users = await User.find({}, "-password")
-        res.status(200).json(users)
-    } catch (error) {
-        
-    }
-}
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}, "-password");
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong", error: error.message });
+  }
+};
+
+module.exports = {
+  getAllUsers,
+  registerUser,
+};

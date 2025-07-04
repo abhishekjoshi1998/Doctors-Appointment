@@ -1,19 +1,18 @@
+require("dotenv").config(); 
+
 const express = require("express");
 const connectToDb = require("./config/db");
 
-
-const userRoutes = require("./routes/user.routes");
-const doctorRoutes = require("./routes/doctor.routes");
+const userRoutes = require("./routes/userRoute");
+const doctorRoutes = require("./routes/doctorProfileRoute");
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
 
-
 app.use("/users", userRoutes);
 app.use("/doctors", doctorRoutes);
-
 
 app.get("/", (req, res) => {
   res.send("API is working...");
