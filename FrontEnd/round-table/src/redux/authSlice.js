@@ -1,28 +1,42 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-
-
-export const signupUser = createAsyncThunk('auth/signupUser', async (userData) => {
-  const res = await fetch('http://localhost:5000/api/signup', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(userData),
-  });
-  return res.json();
+export const signupUser = createAsyncThunk('auth/signupUser', async (userData, { rejectWithValue }) => {
+  try {
+    const res = await fetch('http://localhost:3000/users/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      return rejectWithValue(data.message || 'Signup failed');
+    }
+    return data;
+  } catch (error) {
+    return rejectWithValue(error.message);
+  }
 });
 
-export const loginUser = createAsyncThunk('auth/loginUser', async (userData) => {
-  const res = await fetch('http://localhost:5000/api/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(userData),
-  });
-  return res.json();
+export const loginUser = createAsyncThunk('auth/loginUser', async (userData, { rejectWithValue }) => {
+  try {
+    const res = await fetch('http://localhost:3000/users/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      return rejectWithValue(data.message || 'Login failed');
+    }
+    return data;
+  } catch (error) {
+    return rejectWithValue(error.message);
+  }
 });
 
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    user: null,
+    user: JSON.parse(localStorage.getItem('user')) || null,
     loading: false,
     error: null,
   },
@@ -34,8 +48,10 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Signup
       .addCase(signupUser.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(signupUser.fulfilled, (state, action) => {
         state.loading = false;
@@ -44,19 +60,22 @@ const authSlice = createSlice({
       })
       .addCase(signupUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = 'Signup failed';
+        state.error = action.payload || 'Signup failed';
       })
+
+      // Login
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
         localStorage.setItem('user', JSON.stringify(action.payload));
       })
-      .addCase(loginUser.rejected, (state) => {
+      .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = 'Login failed';
+        state.error = action.payload || 'Login failed';
       });
   },
 });
