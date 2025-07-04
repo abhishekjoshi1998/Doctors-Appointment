@@ -12,7 +12,8 @@ const exregisterUser = async (req, res) => {
       password,
       role: role || "user",
     });
-    await newUSer, save();
+    await newUSer.save();
+
     res.json({ message: "Uaer Registerd..." });
   } catch (error) {
     res.json({ message: "somthing went wrong...." });

@@ -1,12 +1,29 @@
-const express = require("express")
-const connectToDb = require("./config/db")
+const express = require("express");
+const connectToDb = require("./config/db");
 
 
-const app = express()
-app.use(express.json())
-const PORT = 3000
+const userRoutes = require("./routes/user.routes");
+const doctorRoutes = require("./routes/doctor.routes");
 
-app.listen(PORT, ()=>{
-    connectToDb()
-    console.log("server is working")
-})
+const app = express();
+const PORT = 3000;
+
+app.use(express.json());
+
+
+app.use("/users", userRoutes);
+app.use("/doctors", doctorRoutes);
+
+
+app.get("/", (req, res) => {
+  res.send("API is working...");
+});
+
+app.listen(PORT, async () => {
+  try {
+    await connectToDb();
+    console.log(`Server is running on http://localhost:${PORT}`);
+  } catch (err) {
+    console.error("Failed to connect to the database:", err.message);
+  }
+});
